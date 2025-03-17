@@ -3,7 +3,7 @@
 std::mutex mut, mut3;
 std::condition_variable con3, conMain;
 bool flag = false;
-int intCon;
+std::atomic<int> intCon;
 
 void sortPart(std::string name, std::string* pName, double* arr, int len) {
 	double min = 1001;
@@ -29,11 +29,11 @@ void sortPart(std::string name, std::string* pName, double* arr, int len) {
 		std::cout << name << "\t";
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		std::cout << arr[i] << std::endl;
-
 	}
-	std::lock_guard <std::mutex> lock(mut);
+
+	std::lock_guard <std::mutex> lock(mut3);
 	*pName = name;
-	intCon++;
+	intCon.fetch_add(1);
 	con3.notify_one();
 }
 
@@ -43,7 +43,7 @@ void sortArr(std::string name, std::string* pName, double* arr, double* frstPart
 		if (intCon == 1) {
 			std::lock_guard <std::mutex> lock(mut);
 			std::cout << "\n" << *pName << "\tcompleted\n\n";
-			intCon = 2;
+			intCon.fetch_add(1);
 			*pName = "";
 		}
 		con3.wait(lock);
