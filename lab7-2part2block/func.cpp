@@ -5,7 +5,7 @@ std::condition_variable con3, conMain;
 bool flag = false;
 std::atomic<int> intCon;
 
-void sortPart(std::string name, std::string* pName, double* arr, int len) {
+void sortPart(std::string name, double* arr, int len) {
 	double min = 1001;
 	int minNum = 0;
 	auto beginSort = std::chrono::steady_clock::now();
@@ -24,32 +24,26 @@ void sortPart(std::string name, std::string* pName, double* arr, int len) {
 	}
 	for (int i = 0; i < len; i++)
 	{
-		while (*pName != "");
-		std::lock_guard <std::mutex> lock(mut);
-		std::cout << name << "\t";
+		{
+			std::lock_guard <std::mutex> lock(mut);
+			std::cout << name << "\t";
+			std::cout << arr[i] << std::endl;
+		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		std::cout << arr[i] << std::endl;
 	}
 
-	std::lock_guard <std::mutex> lock(mut3);
-	*pName = name;
+	{
+		std::lock_guard <std::mutex> lock(mut3);
+		std::cout << "\n" << name << "\tcompleted...\n\n";
+	}
+
 	intCon.fetch_add(1);
 	con3.notify_one();
 }
 
-void sortArr(std::string name, std::string* pName, double* arr, double* frstPart, double* scndPart, int len) {
+void sortArr(std::string name, double* arr, double* frstPart, double* scndPart, int len) {
 	std::unique_lock<std::mutex> lock(mut3);
-	while (intCon != 3) {
-		if (intCon == 1) {
-			std::lock_guard <std::mutex> lock(mut);
-			std::cout << "\n" << *pName << "\tcompleted\n\n";
-			intCon.fetch_add(1);
-			*pName = "";
-		}
-		con3.wait(lock);
-	}
-
-	std::cout << "\n" << *pName << "\tcompleted\n\n";
+	while (intCon!=2) con3.wait(lock);
 
 	int frst = 0, scnd = 0, k = 0;
 	while ((frst != len / 2) && (scnd != len / 2)) {

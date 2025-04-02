@@ -10,6 +10,6 @@
 
 extern std::condition_variable conMain;
 
-void sortPart(std::string name, std::string* pName, double* arr, int len);
+void sortPart(std::string name, double* arr, int len);
 
-void sortArr(std::string name, std::string* pName, double* arr, double* frstPart, double* scndPart, int num);
+void sortArr(std::string name, double* arr, double* frstPart, double* scndPart, int num);
