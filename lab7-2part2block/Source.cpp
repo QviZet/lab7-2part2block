@@ -6,6 +6,7 @@ int main(int argc, const char* argv[]) {
 	const int len = 100;
 	double* arr;
 	arr = new double[len];
+	std::string name;
 
 	for (int i = 0; i < len; i++)
 	{
@@ -26,11 +27,10 @@ int main(int argc, const char* argv[]) {
 	std::future <void> thread1(std::async(sortPart, "thread1", frstPart, len / 2));
 	std::future <void> thread2(std::async(sortPart, "thread2", scndPart, len / 2));
 
-	std::future <void> thread3(std::async(sortArr, "thread3", arr, frstPart, scndPart, len));
-	std::unique_lock<std::mutex> lockMain(mutMain);
-	conMain.wait(lockMain);
+	std::future <std::string> thread3(std::async(sortArr, "thread3", arr, frstPart, scndPart, len));
+	name = thread3.get();
 
-	std::cout << "\nthread3 completed\n\nSorting completed\n";
+	std::cout << "\n" << name <<  "\tcompleted\n\nSorting completed\n";
 
 	delete[] arr;
 	delete[] frstPart;

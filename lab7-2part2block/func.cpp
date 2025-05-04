@@ -1,7 +1,7 @@
 #include "header.h"
 
 std::mutex mut, mut3;
-std::condition_variable con3, conMain;
+std::condition_variable con3;
 bool flag = false;
 std::atomic<int> intCon;
 
@@ -41,7 +41,7 @@ void sortPart(std::string name, double* arr, int len) {
 	con3.notify_one();
 }
 
-void sortArr(std::string name, double* arr, double* frstPart, double* scndPart, int len) {
+std::string sortArr(std::string name, double* arr, double* frstPart, double* scndPart, int len) {
 	std::unique_lock<std::mutex> lock(mut3);
 	while (intCon!=2) con3.wait(lock);
 
@@ -74,5 +74,6 @@ void sortArr(std::string name, double* arr, double* frstPart, double* scndPart, 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		std::cout << arr[i] << std::endl;
 	}
-	conMain.notify_one();
+
+	return name;
 }
